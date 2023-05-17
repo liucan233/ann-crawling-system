@@ -7,7 +7,7 @@
  */
 const getPagePostArr = (targetDocument) => {
   const postArr = Array.from(
-    targetDocument.querySelectorAll('.data-list > h4 a')
+    targetDocument.querySelectorAll(".data-list > h4 a")
   );
   const postInfo = postArr.map((a) => ({
     title: a.innerText.trim(),
@@ -21,12 +21,12 @@ const getPagePostArr = (targetDocument) => {
  * @returns {Array<string>}
  */
 const getPageUrl = () => {
-  return new Array(50).fill('').map((_,i)=>{
-    if(i===0){
-      return 'http://www.scjc.gov.cn/scjc/scdc/scdc.shtml'
+  return new Array(50).fill("").map((_, i) => {
+    if (i === 0) {
+      return "http://www.scjc.gov.cn/scjc/scdc/scdc.shtml";
     }
-    return `http://www.scjc.gov.cn/scjc/scdc/scdc_${i+1}.shtml`
-  })
+    return `http://www.scjc.gov.cn/scjc/scdc/scdc_${i + 1}.shtml`;
+  });
 };
 
 /**
@@ -42,8 +42,8 @@ const getDocument = (url) => {
   }
   return new Promise((r) => {
     const iframeEle = document.createElement("iframe");
-    iframeEle.src=url;
-    iframeEle.sandbox='allow-same-origin'
+    iframeEle.src = url;
+    iframeEle.sandbox = "allow-same-origin";
     iframeEle.onload = () => {
       console.log("文档读取完成：", url);
       if (iframeEle.contentDocument) {
@@ -67,7 +67,8 @@ const getPostContentAndTime = async (url) => {
     return { content: "抓取失败", publishTime: null };
   }
   const targetDoc = targetPage.document;
-  const content = targetDoc.querySelector(".cont > .info")?.innerText.trim() || "";
+  const content =
+    targetDoc.querySelector(".cont > .info")?.innerText.trim() || "";
   const publishTime =
     targetDoc
       .querySelector(".cont > .time")
@@ -108,7 +109,7 @@ const getAllData = async () => {
     curPagePostArr = getPagePostArr(postArrPage.document);
     postArr.push(...(await getAllPostInfo(curPagePostArr)));
     document.body.removeChild(postArrPage.iframeEle);
-    console.info(`第${i+1}页数据抓取完成`);
+    console.info(`第${i + 1}页数据抓取完成`);
   }
   return postArr;
 };
@@ -146,7 +147,7 @@ getAllData().then((res) => {
   });
 
   if (errorFlag) {
-    console.log('以上文章数据抓取失败');
+    console.log("以上文章数据抓取失败");
   } else {
     console.log(data);
     downloadToLocal(data);
