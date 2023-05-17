@@ -13,5 +13,9 @@
  * }} data
  **/
 const downloadToLocal = (data) => {
-  console.log(data.siteName);
+  const aEle = document.createElement("a");
+  aEle.href = URL.createObjectURL(new Blob([JSON.stringify(data)]));
+  aEle.download = "data.json";
+  document.body.appendChild(aEle);
+  aEle.click();
 };
