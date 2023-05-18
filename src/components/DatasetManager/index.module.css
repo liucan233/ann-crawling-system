@@ -1,0 +1,27 @@
+.title{
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bolder;
+}
+.importBtn{
+    margin: 10px 0;
+    width: 100%;
+}
+.datasetDate,.datasetSite,.datasetTimeSpan{
+    display: inline-block;
+}
+.datasetDate{
+    width: 140px;
+}
+.datasetSite{
+    width: 80px;
+}
+.deleteBtn{
+    cursor: pointer;
+    color: red;
+}
+.datasetList{
+    max-height: 150px;
+    overflow: hidden auto;
+    overscroll-behavior: none;
+}

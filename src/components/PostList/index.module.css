@@ -1,0 +1,11 @@
+.listItem{
+    /* margin: 0 -10px; */
+    cursor: pointer;
+}
+.listItem:hover{
+    background-color: rgb(240, 248, 255);
+}
+.postInfo{
+    display: inline-block;
+    width: 150px;
+}
