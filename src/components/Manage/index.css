@@ -1,0 +1,10 @@
+.content_text{
+}
+
+.cursor2pointer{
+    cursor: pointer;
+}
+
+::-webkit-file-upload-button{
+    display: none;
+}
