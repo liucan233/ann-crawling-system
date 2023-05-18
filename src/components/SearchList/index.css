@@ -1,0 +1,8 @@
+.searchList {
+    height: 80%
+}
+.ant-list-item:hover {
+    background-color: #f5f5f5 !important;
+    cursor: pointer;
+  }
+  
