@@ -8,7 +8,8 @@
 }
 
 .leftWrap,.rightWrap{
-  flex: 0 0 460px;
+  flex: 0 0 40%;
+  max-width: 460px;
 }
 .centerWrap{
   flex: 1 1 0;

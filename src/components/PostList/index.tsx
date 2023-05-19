@@ -25,7 +25,7 @@ export const PostList: FC<{
       <List className={css.list}>
       {postArr.map((p,i) => {
         return (
-          <List.Item key={p.title} className={css.listItem} onClick={onClickItem.bind(null,p)}>
+          <List.Item key={`${p.content?.length}${i}`} className={css.listItem} onClick={onClickItem.bind(null,p)}>
             <List.Item.Meta
               avatar={null}
               title={`${i+1}. ${p.title}`}

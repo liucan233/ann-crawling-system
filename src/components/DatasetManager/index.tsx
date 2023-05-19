@@ -21,19 +21,23 @@ const getEarliestTime = (dataset: TDataset) => {
       result = time;
     }
   }
-  console.log(result);
   return result;
 };
 
 export const DatasetManager: FC<TProps> = ({ onChange, datasetArr }) => {
-  const handleUpload: UploadProps["onChange"] = ({ file }) => {
-    if (typeof file.size === "undefined" || file.size > 10 * 1024 * 1024) {
+  let lastUploadArr:typeof datasetArr=datasetArr
+  const handleUpload: UploadProps["customRequest"] = ({ file }) => {
+    if(!(file instanceof File)){
+      message.error("发生未知错误");
+      return;
+    }
+    if (file.size !== undefined && file.size > 10 * 1024 * 1024) {
       message.error("文件过大");
     } else if (file.type !== "application/json") {
-      message.error("不为json文件");
-    } else if (file.originFileObj) {
+      message.error(file.name+"不为json文件");
+    } else {
       const reader = new FileReader();
-      reader.readAsText(file.originFileObj);
+      reader.readAsText(file);
       reader.onload = () => {
         if (typeof reader.result === "string") {
           const data = JSON.parse(reader.result) as TDataset;
@@ -60,14 +64,14 @@ export const DatasetManager: FC<TProps> = ({ onChange, datasetArr }) => {
             }
           }
           const set = new Set();
-          for (const d of datasetArr) {
-            for (const { title, publishTime, content } of d.postArr) {
-              set.add(`${content?.length || ""}${publishTime}${title}`);
+          for (const d of lastUploadArr) {
+            for (const { title, content } of d.postArr) {
+              set.add(`${content?.length || ""}${title}`);
             }
           }
           const originNum = data.postArr.length;
           data.postArr = data.postArr.filter((p, i) => {
-            const key = `${p.content?.length || ""}${p.publishTime}${p.title}`;
+            const key = `${p.content?.length || ""}${p.title}`;
             const added = set.has(key);
             if (added) {
               console.warn("重复公告", i, p);
@@ -77,17 +81,16 @@ export const DatasetManager: FC<TProps> = ({ onChange, datasetArr }) => {
             return !added;
           });
           if (data.postArr.length < 1) {
-            message.error("添加的数据集为空或已经存在");
+            message.error("添加的数据集为空或已经存在",3000);
             return;
           }
           message.success(
-            `从${originNum}条数据中导入了${data.postArr.length}条`
+            `从${file.name}的${originNum}条数据中导入了${data.postArr.length}条`
           );
-          onChange([data, ...datasetArr]);
+          lastUploadArr=[data, ...lastUploadArr]
+          onChange(lastUploadArr);
         }
       };
-    } else {
-      message.error("发生未知错误");
     }
   };
   const handleDelete = (index: number) => {
@@ -103,12 +106,11 @@ export const DatasetManager: FC<TProps> = ({ onChange, datasetArr }) => {
     <>
       <h3 className={css.title}>从本地导入</h3>
       <Upload.Dragger
-        multiple={false}
+        multiple
         accept="application/json"
-        onChange={handleUpload}
+        customRequest={handleUpload}
         showUploadList={false}
         fileList={[]}
-        customRequest={() => {}}
       >
         <p className="ant-upload-drag-icon">
           <InboxOutlined />

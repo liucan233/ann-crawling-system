@@ -1,6 +1,7 @@
 import { Input, Select, InputProps, Button } from "antd";
 import { FC, ReactNode, useMemo, useState } from "react";
 import { TDataset } from "../../types";
+import { datasetToXlsx } from "../../utils/datasetToXlsx";
 import { PostList } from "../PostList";
 import css from "./index.module.css";
 
@@ -164,22 +165,34 @@ export const CenterPostFilter: FC<TProps> = ({
       })
     );
   };
-  
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // useEffect(handleEnter, [postArr]);
-  const effectiveFilterCnt=textFilterValueArr.reduce((acc,cur)=>cur.text?acc+1:acc,0);
 
-  const shortPostArr=useMemo(()=>{
-    return postArr.map(p=>{
+  const effectiveFilterCnt = textFilterValueArr.reduce(
+    (acc, cur) => (cur.text ? acc + 1 : acc),
+    0
+  );
+
+  const handleExpert = () => {
+    const fileName = textFilterValueArr
+      .filter((v) => v.text)
+      .sort((a, b) => (!a.include || b.include ? -1 : 1))
+      .reduce(
+        (acc, cur) => `${acc}_${cur.include ? "" : "不"}包括${cur.text}`,
+        ""
+      );
+    datasetToXlsx(effectiveFilterCnt ? filteredPostArr : postArr,fileName.substring(1));
+  };
+
+  const shortPostArr = useMemo(() => {
+    return postArr.map((p) => {
       return {
         title: p.title,
         href: p.href,
         publishTime: p.publishTime,
-        content: '',
-        highlight: p.content?.substring(0,50)
-      }
-    })
-  },[postArr])
+        content: "",
+        highlight: p.content?.substring(0, 50),
+      };
+    });
+  }, [postArr]);
   return (
     <div className={css.wrap}>
       <div className={css.filterWrap}>
@@ -197,12 +210,16 @@ export const CenterPostFilter: FC<TProps> = ({
       <div className={css.btnWrap}>
         <Button onClick={onManageDataset}>管理数据集</Button>
         <Button onClick={handleClear}>清空条件</Button>
+        <Button onClick={handleExpert}>导出当前列表</Button>
         <Button type="primary" onClick={handleEnter}>
           搜索（{filteredPostArr.length}条）
         </Button>
       </div>
       <div className={css.listWrap}>
-        <PostList postArr={effectiveFilterCnt?filteredPostArr:shortPostArr} onClickItem={onView} />
+        <PostList
+          postArr={effectiveFilterCnt ? filteredPostArr : shortPostArr}
+          onClickItem={onView}
+        />
       </div>
     </div>
   );
