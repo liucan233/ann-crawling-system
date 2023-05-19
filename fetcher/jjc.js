@@ -10,10 +10,12 @@ const getPagePostArr = (targetDocument) => {
 };
 
 const getPageUrl = () => {
-  const pageArr = document.querySelectorAll(".pages > li > a");
-  return Array.from(pageArr)
-    .map((a) => a.href)
-    .slice(1);
+  return new Array(10).fill('').map((_,i)=>{
+    if(i===0){
+      return 'http://jjc.cq.gov.cn/html/col610287.htm'
+    }
+    return `http://jjc.cq.gov.cn/html/col610287_${i+1}.htm`
+  })
 };
 
 const getDocument = (url) => {
@@ -24,6 +26,7 @@ const getDocument = (url) => {
   return new Promise((r) => {
     const iframeEle = document.createElement("iframe");
     iframeEle.src = url.replace("https", "http");
+    iframeEle.sandbox='allow-same-origin'
     iframeEle.onload = () => {
       console.log("文档读取完成：", url);
       r({ document: iframeEle.contentDocument, iframeEle: iframeEle });
@@ -61,14 +64,13 @@ const getAllPostInfo = async (postInfo) => {
 const getPostArr = async () => {
   const postArr = [];
   const pageUrlArr = getPageUrl();
-  let curPagePostArr = getPagePostArr(document);
-  postArr.push(...(await getAllPostInfo(curPagePostArr)));
+  let curPagePostArr = null;
 
   for (let i = 0; i < pageUrlArr.length; i++) {
     const postArrPage = await getDocument(pageUrlArr[i]);
     console.log("读取新页面文章列表：", pageUrlArr[i], postArrPage);
 
-    curPagePostArr = await getPagePostArr(postArrPage.document);
+    curPagePostArr = getPagePostArr(postArrPage.document);
     postArr.push(...(await getAllPostInfo(curPagePostArr)));
     document.body.removeChild(postArrPage.iframeEle);
   }
