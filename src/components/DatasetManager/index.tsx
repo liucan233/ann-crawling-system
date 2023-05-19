@@ -63,22 +63,25 @@ export const DatasetManager: FC<TProps> = ({ onChange, datasetArr }) => {
               return;
             }
           }
-          const set = new Set();
-          for (const d of lastUploadArr) {
-            for (const { title, content } of d.postArr) {
-              set.add(`${content?.length || ""}${title}`);
+          const map = new Map<string,{dataset:TDataset,index:number}>();
+          for (let i=0;i<lastUploadArr.length;i++) {
+            const d=lastUploadArr[i]
+            for (let j=0;j<d.postArr.length;j++) {
+              const { title, content } =d.postArr[j]
+              map.set(`${content?.length || ""}${title}`,{dataset:d,index:j});
             }
           }
           const originNum = data.postArr.length;
           data.postArr = data.postArr.filter((p, i) => {
             const key = `${p.content?.length || ""}${p.title}`;
-            const added = set.has(key);
-            if (added) {
+            const d = map.get(key);
+            if (d) {
               console.warn("重复公告", i, p);
+              console.warn('之前存在',d.index,d.dataset.postArr[d.index]);
             } else {
-              set.add(key);
+              map.set(key,{dataset: data,index:i});
             }
-            return !added;
+            return !d;
           });
           if (data.postArr.length < 1) {
             message.error("添加的数据集为空或已经存在",3000);
