@@ -4,7 +4,7 @@ import { TDataset } from "../../types";
 import css from "./index.module.css";
 
 export const PostList: FC<{
-  postArr: Array<TDataset["postArr"][0] & { highlight: ReactNode }>;
+  postArr: Array<TDataset["postArr"][0] & { highlight?: ReactNode }>;
   onClickItem: (v:TDataset['postArr'][0])=>any
 }> = ({ postArr,onClickItem }) => {
   const handleOpenSource:MouseEventHandler<HTMLSpanElement>=(e)=>{
@@ -35,7 +35,7 @@ export const PostList: FC<{
                     <span className={css.postInfo}>{p.publishTime}</span>
                     <span className={css.postInfo} data-index={i}>查看原文</span>
                   </div>
-                  {p.highlight}
+                  {p.highlight||p.content}
                 </>
               }
             />

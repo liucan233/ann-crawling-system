@@ -1,13 +1,6 @@
 import { FC } from "react";
 import { DeleteOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Upload,
-  Input,
-  List,
-  UploadProps,
-  message,
-} from "antd";
+import { Button, Upload, Input, List, UploadProps, message } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import css from "./index.module.css";
 import { TDataset } from "../../types";
@@ -28,6 +21,7 @@ const getEarliestTime = (dataset: TDataset) => {
       result = time;
     }
   }
+  console.log(result);
   return result;
 };
 
@@ -49,19 +43,46 @@ export const DatasetManager: FC<TProps> = ({ onChange, datasetArr }) => {
             typeof data.expertTime !== "string" ||
             typeof data.siteUrl !== "string"
           ) {
-            message.error("数据格式不正确");
+            message.error("数据基础信息格式不正确");
             return;
+          }
+          for (let i = 0; i < data.postArr.length; i++) {
+            const { title, publishTime, content, href } = data.postArr[i];
+            if (
+              !href?.startsWith("http") ||
+              !title ||
+              !publishTime ||
+              !content
+            ) {
+              message.error("postArr元素格式不正确");
+              console.error("元素格式错误", "index", i, data.postArr[i]);
+              return;
+            }
           }
           const set = new Set();
           for (const d of datasetArr) {
-            for (const { title } of d.postArr) {
-              set.add(title);
+            for (const { title, publishTime, content } of d.postArr) {
+              set.add(`${content?.length || ""}${publishTime}${title}`);
             }
           }
-          data.postArr = data.postArr.filter((p) => !set.has(p.title));
+          const originNum = data.postArr.length;
+          data.postArr = data.postArr.filter((p, i) => {
+            const key = `${p.content?.length || ""}${p.publishTime}${p.title}`;
+            const added = set.has(key);
+            if (added) {
+              console.warn("重复公告", i, p);
+            } else {
+              set.add(key);
+            }
+            return !added;
+          });
           if (data.postArr.length < 1) {
             message.error("添加的数据集为空或已经存在");
+            return;
           }
+          message.success(
+            `从${originNum}条数据中导入了${data.postArr.length}条`
+          );
           onChange([data, ...datasetArr]);
         }
       };
@@ -116,7 +137,11 @@ export const DatasetManager: FC<TProps> = ({ onChange, datasetArr }) => {
                       {new Date(d.expertTime).toLocaleDateString()}抓取
                     </span>
                     <span className={css.datasetSite}>
-                      <a href={d.siteUrl} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={d.siteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         查看网站
                       </a>
                     </span>

@@ -1,5 +1,5 @@
 import { Input, Select, InputProps, Button } from "antd";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useMemo, useState } from "react";
 import { TDataset } from "../../types";
 import { PostList } from "../PostList";
 import css from "./index.module.css";
@@ -164,9 +164,22 @@ export const CenterPostFilter: FC<TProps> = ({
       })
     );
   };
-
+  
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(handleEnter, [postArr]);
+  // useEffect(handleEnter, [postArr]);
+  const effectiveFilterCnt=textFilterValueArr.reduce((acc,cur)=>cur.text?acc+1:acc,0);
+
+  const shortPostArr=useMemo(()=>{
+    return postArr.map(p=>{
+      return {
+        title: p.title,
+        href: p.href,
+        publishTime: p.publishTime,
+        content: '',
+        highlight: p.content?.substring(0,50)
+      }
+    })
+  },[postArr])
   return (
     <div className={css.wrap}>
       <div className={css.filterWrap}>
@@ -189,7 +202,7 @@ export const CenterPostFilter: FC<TProps> = ({
         </Button>
       </div>
       <div className={css.listWrap}>
-        <PostList postArr={filteredPostArr} onClickItem={onView} />
+        <PostList postArr={effectiveFilterCnt?filteredPostArr:shortPostArr} onClickItem={onView} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 .listItem{
     /* margin: 0 -10px; */
     cursor: pointer;
+    content-visibility: auto;
 }
 .listItem:hover{
     background-color: rgb(240, 248, 255);
